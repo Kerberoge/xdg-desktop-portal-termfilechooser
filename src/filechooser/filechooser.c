@@ -32,7 +32,6 @@ static int exec_filechooser(void *data, bool writing, bool multiple, bool direct
     char *cmd = malloc(str_size);
     snprintf(cmd, str_size, "%s %d %d %d \"%s\" \"%s\"", cmd_script, multiple, directory, writing, path, PATH_PORTAL);
 
-    remove(PATH_PORTAL);
     logprint(TRACE, "executing command: %s", cmd);
     int ret = system(cmd);
     if (ret) {
@@ -92,6 +91,7 @@ static int exec_filechooser(void *data, bool writing, bool multiple, bool direct
     (*selected_files)[num_lines] = NULL;
 
     fclose(fp);
+    remove(PATH_PORTAL);
     return 0;
 }
 
@@ -364,16 +364,6 @@ static int method_save_file(sd_bus_message *msg, void *data, sd_bus_error *ret_e
     }
 
     ret = sd_bus_message_append_strv(reply, selected_files);
-    if (ret < 0) {
-        goto cleanup;
-    }
-
-    ret = sd_bus_message_close_container(reply);
-    if (ret < 0) {
-        goto cleanup;
-    }
-
-    ret = sd_bus_message_close_container(reply);
     if (ret < 0) {
         goto cleanup;
     }
